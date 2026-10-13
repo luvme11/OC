@@ -220,6 +220,15 @@ dialog .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
   <div class="acts"><button class="btn" type="button" id="lcancel">취소</button><button class="btn primary" type="submit">로그인</button></div>
 </form></dialog>
 
+<dialog id="gd"><form id="gf" onsubmit="return false">
+  <h2>GitHub로 바로 올리기</h2>
+  <label class="f"><span>깃허브 저장소 주소 (예: 아이디/저장소)</span><input class="in" id="gRepo" placeholder="luvme11/OC" autocomplete="off"></label>
+  <label class="f"><span>토큰 (내 브라우저에만 저장돼요)</span><input class="in" id="gTok" type="password" autocomplete="off"></label>
+  <label class="f"><span>올릴 파일 이름</span><input class="in" id="gPath" placeholder="index.html" autocomplete="off"></label>
+  <p class="hint" id="gMsg" style="margin:-4px 0 12px"></p>
+  <div class="acts"><button class="btn" type="button" id="gCancel">닫기</button><button class="btn primary" type="button" id="gGo">저장하고 올리기</button></div>
+</form></dialog>
+
 <dialog id="pd"><form id="pf" onsubmit="return false">
   <h2>비밀번호 바꾸기</h2>
   <label class="f"><span>새 비밀번호</span><input class="in" id="npw" type="text" autocomplete="off"></label>
@@ -307,6 +316,7 @@ async function save(){
   if(!ADMIN)return;
   if(!canSave){toast('이 브라우저에서는 저장할 수 없어요. 백업 내보내기를 이용해 주세요.');return;}
   try{await idb.set('data',DB);}catch(e){toast('저장에 실패했어요.');}
+  try{renderAdmin();}catch(e){}
 }
 
 /* ---------- 유틸 ---------- */
@@ -585,15 +595,69 @@ function viewEdit(id,kind='oc'){
 function download(name,blob){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
 }
-function publish(){
+function buildPublished(){
   const S='/*DATA_'+'START*/',E='/*DATA_'+'END*/';
   const a=PRISTINE.indexOf(S),b=PRISTINE.indexOf(E,a);
-  if(a<0||b<0){toast('공개용 파일을 만들지 못했어요.');return;}
+  if(a<0||b<0)return null;
   const json=JSON.stringify(DB).replace(/</g,'\\u003c');
-  const html='<!doctype html>\n'+PRISTINE.slice(0,a+S.length)+json+PRISTINE.slice(b);
+  return '<!doctype html>\n'+PRISTINE.slice(0,a+S.length)+json+PRISTINE.slice(b);
+}
+function markPublished(){try{localStorage.setItem('oc-pub-sig',h53(JSON.stringify(DB)));}catch(e){}}
+function publish(){
+  const html=buildPublished();
+  if(!html){toast('공개용 파일을 만들지 못했어요.');return;}
+  markPublished();
   download('index.html',new Blob([html],{type:'text/html'}));
   toast('공개용 index.html을 만들었어요. 이 파일을 올리면 돼요.');
 }
+function b64(str){
+  const bytes=new TextEncoder().encode(str);let bin='';const CH=0x8000;
+  for(let i=0;i<bytes.length;i+=CH)bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+CH));
+  return btoa(bin);
+}
+function openGithub(){
+  let g={};try{g=JSON.parse(localStorage.getItem('oc-gh')||'{}');}catch(e){}
+  $('#gRepo').value=g.repo||'';$('#gTok').value=g.tok||'';$('#gPath').value=g.path||'index.html';
+  $('#gMsg').textContent='';$('#gd').showModal();
+}
+async function pushGithub(){
+  const msg=$('#gMsg');
+  const repo=$('#gRepo').value.trim().replace(/^https?:\/\/github\.com\//,'').replace(/\.git$/,'').replace(/\/+$/,'');
+  const tok=$('#gTok').value.trim();
+  const path=($('#gPath').value.trim()||'index.html').replace(/^\/+/,'');
+  if(!/^[\w.-]+\/[\w.-]+$/.test(repo)){msg.textContent='저장소 주소를 "아이디/저장소" 모양으로 적어 주세요. 예: luvme11/OC';return;}
+  if(!tok){msg.textContent='토큰을 넣어 주세요.';return;}
+  try{localStorage.setItem('oc-gh',JSON.stringify({repo,tok,path}));}catch(e){}
+  const html=buildPublished();
+  if(!html){msg.textContent='파일을 만들지 못했어요.';return;}
+  const btn=$('#gGo');btn.disabled=true;msg.textContent='올리는 중이에요... (이미지가 많으면 조금 걸려요)';
+  const base=`https://api.github.com/repos/${repo}/contents/`;
+  const enc=x=>x.split('/').map(encodeURIComponent).join('/');
+  const H={Authorization:'Bearer '+tok,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
+  try{
+    const dir=path.includes('/')?path.slice(0,path.lastIndexOf('/')):'';
+    let sha;
+    const g=await fetch(base+enc(dir),{headers:H});
+    if(g.ok){const list=await g.json();const hit=Array.isArray(list)&&list.find(x=>x.path===path);if(hit)sha=hit.sha;}
+    else if(g.status!==404)throw g;
+    const r=await fetch(base+enc(path),{method:'PUT',headers:{...H,'Content-Type':'application/json'},
+      body:JSON.stringify({message:'Update OC dex',content:b64(html),...(sha?{sha}:{})})});
+    if(!r.ok)throw r;
+    markPublished();$('#gd').close();renderAdmin();
+    toast('GitHub에 올렸어요! 1~2분 뒤 사이트에 반영돼요.');
+  }catch(e){
+    let t='올리지 못했어요.';
+    const st=e&&e.status;
+    if(st===401)t='토큰이 맞지 않아요. 다시 확인해 주세요.';
+    else if(st===403)t='이 토큰에 쓰기 권한이 없어요. 토큰을 만들 때 Contents를 "Read and write"로 해 주세요.';
+    else if(st===404)t='저장소를 찾지 못했어요. 주소와, 토큰을 만들 때 고른 저장소를 확인해 주세요.';
+    else if(st===409||st===422)t='파일이 그 사이에 바뀌었어요. 한 번 더 눌러 보세요.';
+    else if(e instanceof TypeError)t='연결하지 못했어요. 인터넷 상태를 확인해 주세요.';
+    msg.textContent=t;
+  }finally{btn.disabled=false;}
+}
+$('#gCancel').onclick=()=>$('#gd').close();
+$('#gGo').onclick=pushGithub;
 function renderAdmin(){
   const box=$('#adm');
   if(!ADMIN){
@@ -601,10 +665,16 @@ function renderAdmin(){
     $('#li').onclick=()=>{$('#lpw').value='';$('#lerr').style.display='none';$('#ld').showModal();setTimeout(()=>$('#lpw').focus(),50);};
     return;
   }
-  box.innerHTML=`<button class="admbtn" id="am" type="button"><i></i>관리자</button>
+  let dirty=true;
+  try{
+    const cur=JSON.stringify(DB);
+    dirty=localStorage.getItem('oc-pub-sig')!==h53(cur)&&JSON.stringify(PUBLISHED)!==cur;
+  }catch(e){}
+  box.innerHTML=`<button class="admbtn" id="am" type="button"><i></i>관리자${dirty?' · 미공개 변경':''}</button>
     <div class="admmenu" id="amenu">
-      <p>관리자 모드 · 수정한 내용은 이 브라우저에 저장돼요. 방문자에게 보이려면 "공개용 파일 만들기"로 만든 파일을 올려 주세요.</p>
-      <button id="pub" type="button">공개용 파일 만들기</button>
+      <p>${dirty?'<b style="color:var(--accent)">방문자에게는 아직 안 보이는 변경이 있어요.</b><br>':''}수정한 내용은 이 브라우저에만 저장돼요. 방문자에게 보이려면 "GitHub로 바로 올리기"를 눌러 주세요.</p>
+      <button id="gh" type="button">GitHub로 바로 올리기</button>
+      <button id="pub" type="button">공개용 파일 받기 (직접 올릴 때)</button>
       <button id="exp" type="button">백업 내보내기</button>
       <button id="imp" type="button">백업 불러오기</button>
       <button id="pwc" type="button">비밀번호 바꾸기</button>
@@ -612,7 +682,8 @@ function renderAdmin(){
     </div>`;
   const menu=$('#amenu'),close=()=>menu.classList.remove('on');
   $('#am').onclick=()=>menu.classList.toggle('on');
-  $('#pub').onclick=()=>{close();publish();};
+  $('#gh').onclick=()=>{close();openGithub();};
+  $('#pub').onclick=()=>{close();publish();renderAdmin();};
   $('#exp').onclick=()=>{close();download('oc-note-backup.json',new Blob([JSON.stringify(DB)],{type:'application/json'}));};
   $('#imp').onclick=()=>{close();$('#fileJson').click();};
   $('#pwc').onclick=()=>{close();$('#npw').value='';$('#pout').style.display='none';$('#pcopy').style.display='none';$('#pd').showModal();};
