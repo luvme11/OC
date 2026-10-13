@@ -298,7 +298,7 @@ const SEED = {
 /* ---------- 관리자 설정 ----------
    관리자 비밀번호 기본값은 admin1234 예요. 화면 아래 "관리자" 로그인 후 "비밀번호 바꾸기"로 바꿀 수 있어요. */
 const ADMIN_SALT='oc-note';
-const ADMIN_HASH='2dzu94kiwno';
+const ADMIN_HASH='pk5229q0op';
 /* "공개용 파일 만들기"를 누르면 아래 null 자리에 내 도감 내용이 들어간 파일이 만들어져요 */
 const PUBLISHED=/*DATA_START*/null/*DATA_END*/;
 function h53(str,seed=0){let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (4294967296*(2097151&h2)+(h1>>>0)).toString(36);}
@@ -735,7 +735,6 @@ function renderAdmin(){
     <div class="admmenu" id="amenu">
       <p>${dirty?'<b style="color:var(--accent)">방문자에게는 아직 안 보이는 변경이 있어요.</b><br>':''}수정하면 몇 초 뒤 자동으로 사이트에 올라가요.</p>
       <button id="fav" type="button">사이트 아이콘 설정</button>
-      <button id="pub" type="button">공개용 파일 받기 (직접 올릴 때)</button>
       <button id="exp" type="button">백업 내보내기</button>
       <button id="imp" type="button">백업 불러오기</button>
       <button id="pwc" type="button">비밀번호 바꾸기</button>
@@ -744,7 +743,6 @@ function renderAdmin(){
   const menu=$('#amenu'),close=()=>menu.classList.remove('on');
   $('#am').onclick=()=>menu.classList.toggle('on');
   $('#fav').onclick=()=>{close();openFav();};
-  $('#pub').onclick=()=>{close();publish();renderAdmin();};
   $('#exp').onclick=()=>{close();download('oc-note-backup.json',new Blob([JSON.stringify(DB)],{type:'application/json'}));};
   $('#imp').onclick=()=>{close();$('#fileJson').click();};
   $('#pwc').onclick=()=>{close();$('#npw').value='';$('#pout').style.display='none';$('#pcopy').style.display='none';$('#pd').showModal();};
