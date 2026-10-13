@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OC 도감</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbfbfa; --card:#fff; --ink:#1c1d21; --sub:#6b6f78; --line:#e6e7ea; --soft:#f1f2f4; --ph:#ececef; --danger:#c2323f; --accent:#c8415a;
+  --sans:'Pretendard',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,textarea{font:inherit;color:var(--ink)}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.wrap{width:min(1120px,100% - 48px);margin:0 auto}
+
+/* 공통 버튼 */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border:1px solid var(--line);background:var(--card);border-radius:10px;font-size:14.5px;font-weight:600;transition:border-color .15s,background .15s}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.primary:hover{background:#34363d}
+.btn.danger{color:var(--danger)}
+.btn.danger:hover{border-color:var(--danger)}
+.btn.sm{padding:6px 12px;font-size:13px;border-radius:8px}
+
+/* 헤더 */
+header{background:rgba(251,251,250,.9);backdrop-filter:blur(8px);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.brand{font-weight:700;font-size:19px;letter-spacing:-.3px}
+.menu{display:flex;gap:4px}
+.menu a{padding:8px 14px;border-radius:8px;font-size:15px;font-weight:500;color:var(--sub)}
+.menu a:hover{background:var(--soft);color:var(--ink)}
+.menu a.on{color:var(--ink);background:var(--soft)}
+.menu small{margin-left:5px;font-size:12px;color:var(--sub);font-weight:400}
+.navr{display:flex;align-items:center;gap:8px}
+.adm{position:relative}
+.admbtn{font-size:12.5px;color:var(--sub);padding:7px 11px;border-radius:8px;border:1px solid var(--line);background:var(--card);display:inline-flex;align-items:center;gap:6px}
+.admbtn:hover{border-color:var(--ink);color:var(--ink)}
+.admbtn i{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block}
+.admmenu{position:absolute;right:0;top:calc(100% + 8px);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;min-width:210px;box-shadow:0 18px 40px -16px rgba(20,22,30,.35);display:none;z-index:30}
+.admmenu.on{display:block}
+.admmenu p{word-break:keep-all;font-size:12px;color:var(--sub);padding:8px 10px 6px;line-height:1.5}
+.admmenu button{display:block;width:100%;text-align:left;padding:9px 10px;border-radius:8px;font-size:14px}
+.admmenu button:hover{background:var(--soft)}
+main{flex:1}
+.top{padding:44px 0 26px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.top h1{font-size:30px;font-weight:700;letter-spacing:-.8px}
+.top p{color:var(--sub);margin-top:6px;font-size:15px}
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.search{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 14px;width:260px}
+.search:focus-within{border-color:var(--ink)}
+.search input{flex:1;border:0;outline:0;background:none;font-size:15px;min-width:0}
+.search input::placeholder{color:#a1a5ad}
+.search svg{width:15px;height:15px;stroke:var(--sub);fill:none;stroke-width:2;flex:none}
+
+/* 카드 */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;padding-bottom:80px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s,box-shadow .2s}
+.card:hover{border-color:#c9cbd1;box-shadow:0 10px 26px -14px rgba(20,22,30,.28)}
+.card .img{aspect-ratio:4/5;background:var(--ph);position:relative;overflow:hidden;display:grid;place-items:center}
+.card .img img{width:100%;height:100%;object-fit:cover;object-position:50% 20%;display:block;transition:transform .5s}
+.card:hover .img img{transform:scale(1.04)}
+.card .no{position:absolute;top:10px;left:10px;font-size:12px;font-weight:600;background:rgba(255,255,255,.92);padding:3px 9px;border-radius:6px}
+.ph{font-size:80px;font-weight:700;color:#bfc2c9}
+.card .body{padding:16px 18px 18px}
+.card .row{display:flex;align-items:baseline;gap:8px}
+.card .nm{font-size:20px;font-weight:700;letter-spacing:-.4px}
+.card .en{font-size:13px;color:var(--sub)}
+.card .hl{margin-top:4px;font-size:14px;color:var(--sub)}
+.tagrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.tagrow u{text-decoration:none;font-size:12.5px;padding:3px 10px;border-radius:999px;background:var(--soft);color:#4a4e57}
+.empty{grid-column:1/-1;text-align:center;padding:90px 0;color:var(--sub)}
+.empty .btn{margin-top:16px}
+
+/* 세계관 */
+.wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;padding-bottom:80px}
+.w{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px 24px;display:flex;flex-direction:column;gap:14px}
+.w h3{font-size:18px;font-weight:700;margin-bottom:6px}
+.w p{color:var(--sub);font-size:15px;white-space:pre-wrap}
+.w .acts{display:flex;gap:6px;margin-top:auto}
+
+/* 상세 */
+.dtop{display:flex;justify-content:space-between;align-items:center;margin-top:28px;gap:10px}
+.back{font-size:14px;color:var(--sub)}.back:hover{color:var(--ink)}
+.d{display:grid;grid-template-columns:minmax(300px,440px) 1fr;gap:56px;padding:26px 0 60px;align-items:start}
+.pic{position:sticky;top:88px}
+.frame{position:relative;background:var(--ph);border:1px solid var(--line);border-radius:14px;overflow:hidden;aspect-ratio:4/5;display:grid;place-items:center}
+.frame img{width:100%;height:100%;object-fit:cover;display:block}
+.frame .ph{font-size:130px}
+.zoom{position:absolute;right:12px;bottom:12px;background:rgba(255,255,255,.95);border:1px solid var(--line);padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600}
+.zoom:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pcap{margin-top:10px;font-size:13px;color:var(--sub);display:flex;justify-content:space-between;gap:10px}
+.info .no{font-size:14px;font-weight:600;color:var(--sub)}
+.info h1{font-size:clamp(40px,5vw,56px);font-weight:800;letter-spacing:-1.5px;line-height:1.15;margin-top:4px}
+.info .en{margin-top:6px;color:var(--sub);font-size:17px}
+.tabs{display:flex;gap:10px;margin-top:30px;border-bottom:1px solid var(--line)}
+.tab{padding:10px 6px;margin-right:12px;font-size:13.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab:hover{color:var(--ink)}
+.tab.on{color:var(--ink);border-color:var(--accent)}
+.pane{display:none;padding-top:26px}.pane.on{display:block}
+.lead{font-size:22px;font-weight:700;letter-spacing:-.5px;line-height:1.45}
+.desc{margin-top:12px;color:#444851;font-size:16px;line-height:1.85;max-width:58ch;word-break:keep-all;white-space:pre-wrap}
+.sechead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:14px}
+.sechead .sl{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--sub)}
+.sechead .code{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:26px;color:var(--accent);line-height:1}
+.spec{margin-top:26px;border-top:1px solid var(--line)}
+.spec div{display:grid;grid-template-columns:110px 1fr;padding:16px 4px;border-bottom:1px solid var(--line)}
+.spec dt{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);padding-top:3px}
+.spec dd{font-weight:600;font-size:15.5px}
+.spec dd .en{font-weight:400;font-size:13.5px;color:var(--sub)}
+.spec dd small{display:block;font-weight:400;font-size:13.5px;color:var(--sub);margin-top:2px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:20px}
+.tag{font-size:13px;padding:4px 12px;border-radius:999px;background:var(--soft);color:#4a4e57}
+.acc{margin-top:14px;border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden}
+.acc:first-of-type{margin-top:22px}
+.acc-btn{width:100%;display:flex;justify-content:space-between;align-items:center;padding:16px 20px;font-size:15.5px;font-weight:600;text-align:left}
+.acc-btn:hover{background:var(--soft)}
+.acc-btn i{font-style:normal;font-size:20px;font-weight:400;color:var(--sub);line-height:1}
+.acc-box{display:none;padding:0 20px 20px;border-top:1px solid var(--line)}
+.acc.open .acc-box{display:block}
+.acc.open .acc-btn{background:var(--soft)}
+.acc-box pre{margin-top:16px;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;line-height:1.8;color:#34373e}
+.acc-box .btn{margin-top:14px}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.gal .gitem{position:relative;aspect-ratio:1}
+.gal .gitem>button:first-child{width:100%;height:100%;border-radius:10px;overflow:hidden;background:var(--ph);border:1px solid var(--line);display:block}
+.gdel{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(20,20,24,.78);color:#fff;font-size:15px;line-height:1;opacity:0;transition:opacity .15s}
+.gitem:hover .gdel,.gdel:focus-visible{opacity:1}
+@media(hover:none){.gdel{opacity:1}}
+.galbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.pbox{border:1px solid #2a2c33;border-radius:12px;background:#0e0f13;overflow:hidden;margin-bottom:14px}
+.pbox-h{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid #2a2c33}
+.pbox-t{font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:#a8abb3;word-break:break-all}
+.copy{display:inline-flex;align-items:center;gap:8px;flex:none;border:1px solid #7a2e3c;color:#e0647c;padding:8px 14px;border-radius:6px;font-size:12.5px;font-weight:600;letter-spacing:.1em}
+.copy:hover{background:rgba(224,100,124,.12)}
+.copy svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2}
+.pbox pre{margin:0;padding:18px;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.8;color:#eceef2}
+.gal img{width:100%;height:100%;object-fit:cover;display:block}
+.none{color:var(--sub)}
+.pn{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:22px 0 64px}
+.pn .sp{visibility:hidden}
+
+/* 편집 폼 */
+.form{display:grid;grid-template-columns:minmax(280px,380px) 1fr;gap:48px;padding:10px 0 60px;align-items:start}
+.uploader{position:sticky;top:88px}
+.drop{aspect-ratio:4/5;border:1.5px dashed #c4c7ce;border-radius:14px;background:var(--card);display:grid;place-items:center;text-align:center;color:var(--sub);cursor:pointer;overflow:hidden;position:relative;font-size:14px}
+.drop:hover{border-color:var(--ink);color:var(--ink)}
+.drop img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.drop b{display:block;font-size:15px;color:var(--ink);margin-bottom:4px}
+.uploader .btn{margin-top:10px;width:100%;justify-content:center}
+.sec{margin-bottom:34px}
+.sec>h2{font-size:17px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.f{display:block;margin-bottom:14px}
+.f>span{display:block;font-size:13.5px;font-weight:600;margin-bottom:6px;color:#3a3d44}
+.in,.ta{width:100%;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:11px 14px;font-size:15px;outline:0}
+.in:focus,.ta:focus{border-color:var(--ink)}
+.ta{resize:vertical;min-height:110px;line-height:1.7}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.srow{display:grid;grid-template-columns:90px 1fr 1fr 36px;gap:8px;margin-bottom:8px;align-items:center}
+.x{width:36px;height:40px;border-radius:8px;color:var(--sub);font-size:18px}
+.x:hover{background:var(--soft);color:var(--danger)}
+.pblock{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--card);margin-bottom:12px}
+.pblock .head{display:flex;gap:8px;margin-bottom:10px}
+.gedit{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.gedit div{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.gedit img{width:100%;height:100%;object-fit:cover;display:block}
+.gedit button{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(20,20,24,.75);color:#fff;font-size:14px;line-height:1}
+.hint{font-size:13px;color:var(--sub);margin-top:6px}
+.savebar{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 30%);padding:26px 0 24px;display:flex;gap:10px;justify-content:flex-end}
+
+footer{border-top:1px solid var(--line);padding:20px 0 28px;font-size:13px;color:var(--sub);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+footer .fl{display:flex;gap:14px}
+footer button{color:var(--sub);text-decoration:underline;text-underline-offset:3px}
+footer button:hover{color:var(--ink)}
+
+/* 다이얼로그 · 토스트 · 라이트박스 */
+dialog{border:0;border-radius:16px;padding:26px;width:min(480px,calc(100% - 32px));margin:auto;box-shadow:0 30px 80px -20px rgba(0,0,0,.4);background:var(--card);color:var(--ink)}
+dialog::backdrop{background:rgba(20,21,26,.45)}
+dialog h2{font-size:18px;margin-bottom:16px}
+dialog .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:80}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.lb{position:fixed;inset:0;background:rgba(15,16,20,.9);display:none;align-items:center;justify-content:center;z-index:50;padding:40px;cursor:zoom-out}
+.lb.on{display:flex}.lb img{max-width:100%;max-height:100%;border-radius:8px}
+
+@media(max-width:820px){
+  .wrap{width:calc(100% - 32px)}
+  .grid{grid-template-columns:1fr 1fr;gap:12px}
+  .card .body{padding:12px 12px 14px}.card .nm{font-size:17px}
+  .search{width:100%;order:2}.tools{width:100%}
+  .d,.form{grid-template-columns:1fr;gap:28px}.pic,.uploader{position:static}
+  .srow{grid-template-columns:1fr 1fr 36px}.srow .lb1{grid-column:1/3}
+  .two{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav">
+  <a class="brand" href="#/">OC 도감</a>
+  <div class="navr">
+    <nav class="menu">
+      <a id="mOC" href="#/">OC<small id="mOCn"></small></a>
+      <a id="mW" href="#/world">Canon<small id="mWn"></small></a>
+    </nav>
+    <div class="adm" id="adm"></div>
+  </div>
+</div></header>
+<main class="wrap" id="view"></main>
+<footer class="wrap" id="foot"><span>나의 창작 기록</span></footer>
+
+<dialog id="ld"><form id="lf">
+  <h2>관리자 로그인</h2>
+  <label class="f"><span>비밀번호</span><input class="in" id="lpw" type="password" autocomplete="off"></label>
+  <p class="hint" id="lerr" style="color:var(--danger);display:none;margin:-6px 0 12px">비밀번호가 맞지 않아요.</p>
+  <div class="acts"><button class="btn" type="button" id="lcancel">취소</button><button class="btn primary" type="submit">로그인</button></div>
+</form></dialog>
+
+<dialog id="pd"><form id="pf" onsubmit="return false">
+  <h2>비밀번호 바꾸기</h2>
+  <label class="f"><span>새 비밀번호</span><input class="in" id="npw" type="text" autocomplete="off"></label>
+  <div id="pout" style="display:none">
+    <p class="hint" style="margin:0 0 8px">아래 한 줄을 복사하세요. 메모장으로 이 파일(index.html)을 열고 Ctrl+F로 <b>ADMIN_HASH</b> 를 검색해서, 찾은 줄 전체를 복사한 글로 바꾼 뒤 저장하면 끝이에요.</p>
+    <textarea class="ta" id="pline" readonly style="min-height:72px;font-family:ui-monospace,Consolas,monospace;font-size:13px"></textarea>
+  </div>
+  <div class="acts" style="margin-top:12px"><button class="btn" type="button" id="pcancel">닫기</button><button class="btn" type="button" id="pcopy" style="display:none">복사</button><button class="btn primary" type="button" id="pmake">글자 만들기</button></div>
+</form></dialog>
+
+
+
+<div class="toast" id="toast"></div>
+<div class="lb" id="lb"><img id="lbImg" alt=""></div>
+<input type="file" id="fileJson" accept="application/json,.json" hidden>
+
+<script>
+const PRISTINE=document.documentElement.outerHTML;
+/* =====================================================
+   처음 한 번만 보이는 예시 데이터예요.
+   이후에는 화면의 "새 캐릭터 / 수정" 버튼으로 직접 쓰면 돼요.
+   ===================================================== */
+const SEED = {
+  characters:[
+    {id:"yuan", ko:"유안", en:"Yuan", img:"images/yuan.jpg", caption:"Crimson & Silver",
+     headline:"빨간 머리, 실버 눈동자.",
+     desc:"긴 빨간 머리를 하프 업으로 정리한, 차분한 표정의 남성. 은빛 눈동자와 목에서 어깨에 걸친 문신이 특징.",
+     settings:[{label:"머리",value:"크림슨 레드",sub:"롱 · 하프 업"},{label:"눈",value:"메탈릭 실버",sub:""},{label:"체형",value:"근육질",sub:"넓은 어깨 폭"},{label:"특징",value:"여러 피어싱",sub:"목, 어깨 문신"}],
+     tags:["붉은 머리","실버 아이","문신"],
+     prompts:[{title:"외모 프롬프트",text:"1boy, long crimson red hair, half up, metallic silver eyes, calm expression, muscular, wide shoulders, multiple piercings, neck and shoulder tattoo"}],
+     gallery:[]},
+    {id:"alru", ko:"아를", en:"Alru", img:"images/alru.jpg", caption:"Black & Gold",
+     headline:"검은 여우 귀, 황금빛 눈.",
+     desc:"단정한 일자 앞머리와 검은 여우 귀를 가진 소녀. 황금빛 눈동자가 인상적이다.",
+     settings:[{label:"머리",value:"블랙",sub:"롱 · 일자 앞머리"},{label:"눈",value:"골드",sub:""},{label:"체형",value:"슬렌더",sub:""},{label:"특징",value:"여우 귀",sub:""}],
+     tags:["검은 머리","여우 귀","금안"],
+     prompts:[{title:"외모 프롬프트",text:"1girl, black fox ears, long black hair, blunt bangs, golden eyes"}],
+     gallery:[]},
+    {id:"ragna", ko:"라구나", en:"Ragna", img:"images/ragna.jpg", caption:"Horns & Stitches",
+     headline:"굽은 뿔, 봉합선 흉터.",
+     desc:"굽이치는 뿔과 얼굴을 가로지르는 봉합선 흉터가 인상적인 인물. 한쪽 눈만 황금빛이다.",
+     settings:[{label:"머리",value:"블랙",sub:"롱 · 흐트러진"},{label:"눈",value:"골드 (한쪽)",sub:""},{label:"체형",value:"마른 근육형",sub:""},{label:"특징",value:"뿔 · 흉터",sub:""}],
+     tags:["뿔","흉터"],
+     prompts:[{title:"외모 프롬프트",text:"1boy, curved horns, long black hair, stitched scar across face, one golden eye"}],
+     gallery:[]}
+  ],
+  world:[
+    {id:"w1", title:"세계관 개요", text:"이야기의 배경이 되는 세계의 큰 그림을 적어주세요."},
+    {id:"w2", title:"주요 장소", text:"캐릭터들이 머무르고 오가는 장소들."},
+    {id:"w3", title:"종족과 설정", text:"뿔, 짐승 귀 등 세계에 존재하는 종족과 규칙."}
+  ]
+};
+
+/* ---------- 관리자 설정 ----------
+   관리자 비밀번호 기본값은 admin1234 예요. 화면 아래 "관리자" 로그인 후 "비밀번호 바꾸기"로 바꿀 수 있어요. */
+const ADMIN_SALT='oc-note';
+const ADMIN_HASH='2dzu94kiwno';
+/* "공개용 파일 만들기"를 누르면 아래 null 자리에 내 도감 내용이 들어간 파일이 만들어져요 */
+const PUBLISHED=/*DATA_START*/null/*DATA_END*/;
+function h53(str,seed=0){let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (4294967296*(2097151&h2)+(h1>>>0)).toString(36);}
+const pwHash=pw=>h53(ADMIN_SALT+'|'+pw);
+let ADMIN=false;
+try{ADMIN=localStorage.getItem('oc-admin')===ADMIN_HASH;}catch(e){}
+
+/* ---------- 저장소 (IndexedDB — 이미지가 많아도 넉넉해요) ---------- */
+const idb={
+  open(){return new Promise((ok,no)=>{const r=indexedDB.open('oc-note',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error);});},
+  async get(k){const db=await this.open();return new Promise((ok,no)=>{const q=db.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error);});},
+  async set(k,v){const db=await this.open();return new Promise((ok,no)=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=()=>ok();t.onerror=()=>no(t.error);});}
+};
+let DB=null, canSave=true;
+function migrate(){
+  DB.characters=DB.characters||[];DB.world=DB.world||[];
+  DB.world=DB.world.map(w=>w.ko!==undefined?w:{id:w.id,ko:w.title||'',en:'',img:'',caption:'',headline:'',desc:w.text||'',settings:[],tags:[],prompts:[],gallery:[],section:'',code:''});
+  for(const c of [...DB.characters,...DB.world]){c.settings=c.settings||[];c.tags=c.tags||[];c.prompts=c.prompts||[];c.gallery=c.gallery||[];}
+}
+async function load(){
+  let stored=null;
+  try{ stored=await idb.get('data'); }catch(e){ canSave=false; }
+  DB=ADMIN?(stored||PUBLISHED||structuredClone(SEED)):(PUBLISHED||stored||structuredClone(SEED));
+  DB=structuredClone(DB);
+  migrate();
+}
+async function save(){
+  if(!ADMIN)return;
+  if(!canSave){toast('이 브라우저에서는 저장할 수 없어요. 백업 내보내기를 이용해 주세요.');return;}
+  try{await idb.set('data',DB);}catch(e){toast('저장에 실패했어요.');}
+}
+
+/* ---------- 유틸 ---------- */
+const $=s=>document.querySelector(s);
+const p3=n=>String(n).padStart(3,'0');
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const initial=c=>esc((c.ko||'?')[0]);
+const img=c=>c.img?`<img src="${esc(c.img)}" alt="${esc(c.ko)}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ph',textContent:'${initial(c)}'}))">`:`<span class="ph">${initial(c)}</span>`;
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2200);}
+function resize(file,max=1400){
+  return new Promise((ok,no)=>{
+    const r=new FileReader();
+    r.onerror=no;
+    r.onload=()=>{const im=new Image();im.onerror=no;im.onload=()=>{
+      const k=Math.min(1,max/Math.max(im.width,im.height));
+      const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
+      const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+      ok(c.toDataURL('image/jpeg',.86));};im.src=r.result;};
+    r.readAsDataURL(file);
+  });
+}
+function nav(w){
+  $('#mOCn').textContent=DB.characters.length;$('#mWn').textContent=DB.world.length;
+  $('#mOC').classList.toggle('on',w==='oc');$('#mW').classList.toggle('on',w==='world');
+}
+
+/* ---------- OC / Canon 공통 설정 ---------- */
+const KINDS={
+  oc:{key:'characters',nav:'oc',noun:'OC',head:'OC 도감',pre:'No.',code:'U',unit:'명',
+      list:'#/',det:'#/c/',nw:'#/new',ed:'#/edit/',sect:'Appearance',rows:['HAIR','EYES','BUILD','DETAILS'],
+      lk:'이름',lk2:'영문 이름',nameRow:'Name',ph:{ko:'유안',en:'Yuan',hl:'빨간 머리, 실버 눈동자.',cap:'Crimson & Silver',tags:'붉은 머리, 문신'}},
+  canon:{key:'world',nav:'world',noun:'Canon',head:'Canon',pre:'C.',code:'C',unit:'개',
+      list:'#/world',det:'#/w/',nw:'#/wnew',ed:'#/wedit/',sect:'Canon',rows:['TYPE','PLACE','NOTE'],
+      lk:'제목',lk2:'영문 제목',nameRow:'Title',ph:{ko:'세계관 개요',en:'Overview',hl:'이 세계를 한 줄로 소개해요.',cap:'Main Map',tags:'도시, 종족'}}
+};
+const COL=k=>DB[KINDS[k].key];
+
+/* ---------- 목록 ---------- */
+function viewList(kind='oc'){
+  const K=KINDS[kind];nav(K.nav);
+  $('#view').innerHTML=`
+  <div class="top">
+    <div><h1>${K.head}</h1><p id="cnt"></p></div>
+    <div class="tools">
+      <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="q" placeholder="이름이나 특징으로 찾기" autocomplete="off"></label>
+      ${ADMIN?`<a class="btn primary" href="${K.nw}">+ 새 ${K.noun}</a>`:''}
+    </div>
+  </div>
+  <div class="grid" id="grid"></div>`;
+  const arr=COL(kind);
+  const draw=()=>{
+    const k=$('#q').value.trim().toLowerCase();
+    const list=arr.map((c,i)=>({c,i})).filter(({c})=>!k||[c.ko,c.en,c.headline,c.desc,...c.tags,...c.settings.map(s=>s.value)].join(' ').toLowerCase().includes(k));
+    $('#cnt').textContent=`총 ${list.length}${K.unit}`;
+    $('#grid').innerHTML=list.length?list.map(({c,i})=>`
+      <a class="card" href="${K.det}${c.id}">
+        <div class="img">${img(c)}<span class="no">${K.pre}${p3(i+1)}</span></div>
+        <div class="body">
+          <div class="row"><span class="nm">${esc(c.ko)}</span><span class="en">${esc(c.en)}</span></div>
+          ${c.headline?`<div class="hl">${esc(c.headline)}</div>`:''}
+          ${c.tags.length?`<div class="tagrow">${c.tags.map(t=>`<u>${esc(t)}</u>`).join('')}</div>`:''}
+        </div>
+      </a>`).join(''):(arr.length?`<div class="empty">찾는 항목이 없어요. 다른 단어로 검색해 보세요.</div>`:`<div class="empty">아직 항목이 없어요.${ADMIN?`<br><a class="btn primary" href="${K.nw}">+ 첫 ${K.noun} 쓰기</a>`:''}</div>`);
+  };
+  draw();$('#q').oninput=draw;
+}
+
+/* ---------- 상세 ---------- */
+function copyText(t){
+  if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(t);
+  return new Promise((ok,no)=>{
+    const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(a);a.select();
+    try{document.execCommand('copy')?ok():no();}catch(e){no(e);}
+    a.remove();
+  });
+}
+const COPY_ICON='<svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="1"/><path d="M5 15V4a1 1 0 0 1 1-1h11"/></svg>';
+function viewDetail(id,tab='a',kind='oc'){
+  const K=KINDS[kind],arr=COL(kind);
+  const idx=arr.findIndex(c=>c.id===id);if(idx<0)return viewList(kind);
+  const c=arr[idx],prev=arr[idx-1],next=arr[idx+1];
+  nav(K.nav);
+  const code=c.code||(K.code+String(idx+1).padStart(2,'0'));
+  const sect=c.section||K.sect;
+  const rows=c.settings.filter(s=>s.label||s.value);
+  const prs=c.prompts.filter(p=>p.text.trim());
+  const pbox=prs.map((p,i)=>`
+    <div class="pbox"><div class="pbox-h"><span class="pbox-t">${esc(p.title||'PROMPT')}</span>
+    <button class="copy" data-copy="${i}" type="button"><span>COPY</span>${COPY_ICON}</button></div>
+    <pre>${esc(p.text)}</pre></div>`).join('');
+  const gal=`
+    <div class="galbar"><span class="none">${c.gallery.length}장</span>${ADMIN?'<button class="btn sm" id="gAdd" type="button">+ 이미지 추가</button>':''}</div>
+    ${c.gallery.length?`<div class="gal">${c.gallery.map((g,i)=>`<div class="gitem"><button data-lb="${esc(g)}" type="button"><img src="${esc(g)}" alt="" loading="lazy"></button>${ADMIN?`<button class="gdel" data-gdel="${i}" type="button" aria-label="이미지 삭제">×</button>`:''}</div>`).join('')}</div>`:`<p class="none">${ADMIN?'아직 이미지가 없어요. 위의 버튼으로 올려보세요. (여러 장 선택하거나 끌어다 놓아도 돼요)':'등록된 이미지가 아직 없어요.'}</p>`}
+    ${ADMIN?'<input type="file" id="fGalD" accept="image/*" multiple hidden>':''}`;
+  $('#view').innerHTML=`
+  <div class="dtop"><a class="back" href="${K.list}">← 목록으로</a>
+    ${ADMIN?`<div class="tools"><a class="btn sm" href="${K.ed}${c.id}">수정</a><button class="btn sm danger" id="del" type="button">삭제</button></div>`:''}</div>
+  <section class="d">
+    <div class="pic">
+      <div class="frame">${img(c)}${c.img?`<button class="zoom" data-lb="${esc(c.img)}" type="button">크게 보기</button>`:''}</div>
+      <div class="pcap"><span>${p3(idx+1)} / 메인 이미지</span><span>${esc(c.caption)}</span></div>
+    </div>
+    <div class="info">
+      <div class="no">${K.pre}${p3(idx+1)}</div>
+      <h1>${esc(c.ko)}</h1><div class="en">${esc(c.en)}</div>
+      <div class="tabs"><button class="tab on" data-p="a" type="button">Profile</button><button class="tab" data-p="b" type="button">Prompt</button><button class="tab" data-p="c" type="button">갤러리</button></div>
+      <div class="pane on" id="pa">
+        <div class="sechead"><span class="sl">${esc(sect)}</span><span class="code">${esc(code)}</span></div>
+        ${c.headline?`<p class="lead">${esc(c.headline)}</p>`:''}
+        ${c.desc?`<p class="desc">${esc(c.desc)}</p>`:''}
+        <dl class="spec"><div><dt>${K.nameRow}</dt><dd>${esc(c.ko)}${c.en?` <span class="en">/ ${esc(c.en)}</span>`:''}</dd></div>${rows.map(s=>`<div><dt>${esc(s.label)}</dt><dd>${esc(s.value)}${s.sub?`<small>${esc(s.sub)}</small>`:''}</dd></div>`).join('')}</dl>
+        ${c.tags.length?`<div class="tags">${c.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
+      </div>
+      <div class="pane" id="pb">${pbox||`<p class="none">${ADMIN?'등록된 프롬프트가 없어요. 수정 버튼으로 추가할 수 있어요.':'등록된 프롬프트가 없어요.'}</p>`}</div>
+      <div class="pane" id="pc">${gal}</div>
+    </div>
+  </section>
+  <div class="pn">${prev?`<a class="btn" href="${K.det}${prev.id}">← ${esc(prev.ko)}</a>`:'<a class="btn sp">.</a>'}${next?`<a class="btn" href="${K.det}${next.id}">${esc(next.ko)} →</a>`:'<a class="btn sp">.</a>'}</div>`;
+  const setTab=k=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.dataset.p===k));
+    ['a','b','c'].forEach(q=>$('#p'+q).classList.toggle('on',q===k));
+  };
+  document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setTab(b.dataset.p));
+  setTab(tab);
+  document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{
+    try{
+      await copyText(prs[+b.dataset.copy].text);
+      const sp=b.querySelector('span');sp.textContent='COPIED';setTimeout(()=>sp.textContent='COPY',1400);
+    }catch{toast('복사에 실패했어요');}
+  });
+  const addFiles=async files=>{
+    let n=0;
+    for(const f of files){
+      if(!f.type.startsWith('image/'))continue;
+      try{c.gallery.push(await resize(f,1600));n++;}catch{}
+    }
+    if(!n){toast('이미지를 불러오지 못했어요.');return;}
+    await save();toast(n+'장 추가했어요');viewDetail(c.id,'c',kind);
+  };
+  if(ADMIN){
+    $('#gAdd').onclick=()=>$('#fGalD').click();
+    $('#fGalD').onchange=e=>addFiles([...e.target.files]);
+    const pc=$('#pc');
+    pc.ondragover=e=>e.preventDefault();
+    pc.ondrop=e=>{e.preventDefault();addFiles([...e.dataTransfer.files]);};
+  }
+  document.querySelectorAll('[data-gdel]').forEach(b=>b.onclick=async()=>{
+    if(!confirm('이 이미지를 삭제할까요?'))return;
+    c.gallery.splice(+b.dataset.gdel,1);await save();toast('삭제했어요');viewDetail(c.id,'c',kind);
+  });
+  if(ADMIN)$('#del').onclick=async()=>{
+    if(!confirm(`'${c.ko}' 항목을 삭제할까요? 되돌릴 수 없어요.`))return;
+    DB[K.key]=DB[K.key].filter(x=>x.id!==c.id);await save();toast('삭제했어요');go(K.list);
+  };
+}
+
+/* ---------- 글쓰기 / 수정 ---------- */
+function viewEdit(id,kind='oc'){
+  if(!ADMIN){toast('관리자만 수정할 수 있어요.');return go(KINDS[kind].list);}
+  const K=KINDS[kind],arr=COL(kind);nav(K.nav);
+  const orig=id?arr.find(c=>c.id===id):null;
+  if(id&&!orig)return viewList(kind);
+  const back=orig?K.det+orig.id:K.list;
+  const d=orig?structuredClone(orig):{id:'',ko:'',en:'',img:'',caption:'',headline:'',desc:'',
+    settings:K.rows.map(l=>({label:l,value:'',sub:''})),tags:[],prompts:[{title:'',text:''}],gallery:[],section:K.sect,code:''};
+  d.section=d.section??'';d.code=d.code??'';
+  d.tagsText=d.tags.join(', ');
+  const paint=()=>{
+    const y=scrollY;
+    $('#view').innerHTML=`
+    <div class="dtop"><a class="back" href="${back}">← 취소하고 돌아가기</a></div>
+    <div class="top" style="padding-top:22px"><div><h1>${orig?esc(orig.ko)+' 수정':'새 '+K.noun+' 쓰기'}</h1><p>빈칸은 비워둬도 돼요. ${K.lk}만 있으면 저장할 수 있어요.</p></div></div>
+    <form class="form" id="ef" autocomplete="off">
+      <div class="uploader">
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="이미지 선택">${d.img?`<img src="${esc(d.img)}" alt="">`:`<div><b>대표 이미지</b>눌러서 사진 선택<br>또는 여기로 끌어다 놓기</div>`}</div>
+        ${d.img?`<button class="btn sm" type="button" data-a="rmimg">이미지 지우기</button>`:''}
+        <input type="file" id="fImg" accept="image/*" hidden>
+      </div>
+      <div>
+        <div class="sec"><h2>기본 정보</h2>
+          <div class="two">
+            <label class="f"><span>${K.lk} *</span><input class="in" data-f="ko" value="${esc(d.ko)}" maxlength="30" placeholder="${K.ph.ko}"></label>
+            <label class="f"><span>${K.lk2}</span><input class="in" data-f="en" value="${esc(d.en)}" maxlength="40" placeholder="${K.ph.en}"></label>
+          </div>
+          <label class="f"><span>한 줄 소개</span><input class="in" data-f="headline" value="${esc(d.headline)}" maxlength="80" placeholder="${K.ph.hl}"></label>
+          <label class="f"><span>소개글</span><textarea class="ta" data-f="desc" placeholder="자유롭게 적어주세요.">${esc(d.desc)}</textarea></label>
+          <div class="two">
+            <label class="f"><span>소개 제목 (예: APPEARANCE)</span><input class="in" data-f="section" value="${esc(d.section)}" maxlength="30" placeholder="${K.sect}"></label>
+            <label class="f"><span>코드 (예: ${K.code}03 · 비우면 번호로 자동)</span><input class="in" data-f="code" value="${esc(d.code)}" maxlength="12" placeholder="${K.code}03"></label>
+          </div>
+          <div class="two">
+            <label class="f"><span>이미지 설명</span><input class="in" data-f="caption" value="${esc(d.caption)}" maxlength="40" placeholder="${K.ph.cap}"></label>
+            <label class="f"><span>태그</span><input class="in" data-f="tagsText" value="${esc(d.tagsText)}" placeholder="${K.ph.tags}"></label>
+          </div>
+          <p class="hint" style="margin-top:-4px">태그는 쉼표(,)로 구분해요.</p>
+        </div>
+
+        <div class="sec"><h2>소개 항목 (왼쪽 제목 / 오른쪽 내용) <button class="btn sm" type="button" data-a="addrow">+ 줄 추가</button></h2>
+          ${d.settings.map((s,i)=>`<div class="srow">
+            <input class="in lb1" data-s="${i}.label" value="${esc(s.label)}" placeholder="왼쪽 (예: HAIR)">
+            <input class="in" data-s="${i}.value" value="${esc(s.value)}" placeholder="오른쪽 (예: 실버 화이트 롱)">
+            <input class="in" data-s="${i}.sub" value="${esc(s.sub)}" placeholder="보충 설명 (선택)">
+            <button class="x" type="button" data-a="delrow" data-i="${i}" aria-label="줄 삭제">×</button></div>`).join('')||'<p class="hint">원하는 항목을 추가해 보세요.</p>'}
+        </div>
+
+        <div class="sec"><h2>프롬프트 <button class="btn sm" type="button" data-a="addp">+ 추가</button></h2>
+          ${d.prompts.map((p,i)=>`<div class="pblock"><div class="head">
+            <input class="in" data-p="${i}.title" value="${esc(p.title)}" placeholder="제목 (예: SHIO/ORIGINAL)">
+            <button class="x" type="button" data-a="delp" data-i="${i}" aria-label="프롬프트 삭제">×</button></div>
+            <textarea class="ta" data-p="${i}.text" placeholder="복사해서 쓸 프롬프트를 붙여넣으세요.">${esc(p.text)}</textarea></div>`).join('')||'<p class="hint">이미지 생성에 쓰는 프롬프트를 저장해 두면 상세 페이지에서 바로 복사할 수 있어요.</p>'}
+        </div>
+
+        <div class="sec"><h2>갤러리 <button class="btn sm" type="button" data-a="addg">+ 이미지 추가</button></h2>
+          ${d.gallery.length?`<div class="gedit">${d.gallery.map((g,i)=>`<div><img src="${esc(g)}" alt=""><button type="button" data-a="delg" data-i="${i}" aria-label="이미지 삭제">×</button></div>`).join('')}</div>`:'<p class="hint">추가 이미지가 있다면 여기에 올려요. 여러 장도 한 번에 선택할 수 있어요.</p>'}
+          <input type="file" id="fGal" accept="image/*" multiple hidden>
+        </div>
+        <div class="savebar"><a class="btn" href="${back}">취소</a><button class="btn primary" type="submit">저장하기</button></div>
+      </div>
+    </form>`;
+    scrollTo(0,y);
+    wire();
+  };
+  const pick=async(file)=>{ if(!file||!file.type.startsWith('image/'))return; try{d.img=await resize(file);paint();}catch{toast('이미지를 불러오지 못했어요.');} };
+  function wire(){
+    const f=$('#ef');
+    f.addEventListener('input',e=>{
+      const t=e.target;
+      if(t.dataset.f)d[t.dataset.f]=t.value;
+      else if(t.dataset.s){const[i,k]=t.dataset.s.split('.');d.settings[+i][k]=t.value;}
+      else if(t.dataset.p){const[i,k]=t.dataset.p.split('.');d.prompts[+i][k]=t.value;}
+    });
+    f.addEventListener('click',e=>{
+      const b=e.target.closest('[data-a]');if(!b)return;const i=+b.dataset.i;
+      switch(b.dataset.a){
+        case 'addrow':d.settings.push({label:'',value:'',sub:''});break;
+        case 'delrow':d.settings.splice(i,1);break;
+        case 'addp':d.prompts.push({title:'',text:''});break;
+        case 'delp':d.prompts.splice(i,1);break;
+        case 'delg':d.gallery.splice(i,1);break;
+        case 'rmimg':d.img='';break;
+        case 'addg':$('#fGal').click();return;
+      }
+      paint();
+    });
+    const drop=$('#drop');
+    drop.onclick=()=>$('#fImg').click();
+    drop.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#fImg').click();}};
+    drop.ondragover=e=>{e.preventDefault();drop.style.borderColor='var(--ink)';};
+    drop.ondragleave=()=>drop.style.borderColor='';
+    drop.ondrop=e=>{e.preventDefault();pick(e.dataTransfer.files[0]);};
+    $('#fImg').onchange=e=>pick(e.target.files[0]);
+    $('#fGal').onchange=async e=>{
+      for(const file of e.target.files){try{d.gallery.push(await resize(file,1600));}catch{}}
+      paint();
+    };
+    f.addEventListener('submit',async e=>{
+      e.preventDefault();
+      if(!d.ko.trim()){toast(K.lk+'을(를) 입력해 주세요.');f.querySelector('[data-f="ko"]').focus();return;}
+      const out={
+        id:orig?orig.id:(kind==='oc'?'c':'w')+Date.now(), ko:d.ko.trim(), en:d.en.trim(), img:d.img, caption:d.caption.trim(),
+        headline:d.headline.trim(), desc:d.desc, section:d.section.trim(), code:d.code.trim(),
+        settings:d.settings.filter(s=>s.label.trim()||s.value.trim()).map(s=>({label:s.label.trim(),value:s.value.trim(),sub:s.sub.trim()})),
+        tags:d.tagsText.split(',').map(t=>t.trim()).filter(Boolean),
+        prompts:d.prompts.filter(p=>p.text.trim()||p.title.trim()).map(p=>({title:p.title.trim(),text:p.text})),
+        gallery:d.gallery
+      };
+      if(orig)arr[arr.findIndex(c=>c.id===orig.id)]=out;else arr.push(out);
+      await save();toast('저장했어요');go(K.det+out.id);
+    });
+  }
+  paint();
+}
+
+/* ---------- 관리자 · 백업 · 공개용 파일 ---------- */
+function download(name,blob){
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+}
+function publish(){
+  const S='/*DATA_'+'START*/',E='/*DATA_'+'END*/';
+  const a=PRISTINE.indexOf(S),b=PRISTINE.indexOf(E,a);
+  if(a<0||b<0){toast('공개용 파일을 만들지 못했어요.');return;}
+  const json=JSON.stringify(DB).replace(/</g,'\\u003c');
+  const html='<!doctype html>\n'+PRISTINE.slice(0,a+S.length)+json+PRISTINE.slice(b);
+  download('index.html',new Blob([html],{type:'text/html'}));
+  toast('공개용 index.html을 만들었어요. 이 파일을 올리면 돼요.');
+}
+function renderAdmin(){
+  const box=$('#adm');
+  if(!ADMIN){
+    box.innerHTML='<button class="admbtn" id="li" type="button">관리자</button>';
+    $('#li').onclick=()=>{$('#lpw').value='';$('#lerr').style.display='none';$('#ld').showModal();setTimeout(()=>$('#lpw').focus(),50);};
+    return;
+  }
+  box.innerHTML=`<button class="admbtn" id="am" type="button"><i></i>관리자</button>
+    <div class="admmenu" id="amenu">
+      <p>관리자 모드 · 수정한 내용은 이 브라우저에 저장돼요. 방문자에게 보이려면 "공개용 파일 만들기"로 만든 파일을 올려 주세요.</p>
+      <button id="pub" type="button">공개용 파일 만들기</button>
+      <button id="exp" type="button">백업 내보내기</button>
+      <button id="imp" type="button">백업 불러오기</button>
+      <button id="pwc" type="button">비밀번호 바꾸기</button>
+      <button id="lo" type="button">로그아웃</button>
+    </div>`;
+  const menu=$('#amenu'),close=()=>menu.classList.remove('on');
+  $('#am').onclick=()=>menu.classList.toggle('on');
+  $('#pub').onclick=()=>{close();publish();};
+  $('#exp').onclick=()=>{close();download('oc-note-backup.json',new Blob([JSON.stringify(DB)],{type:'application/json'}));};
+  $('#imp').onclick=()=>{close();$('#fileJson').click();};
+  $('#pwc').onclick=()=>{close();$('#npw').value='';$('#pout').style.display='none';$('#pcopy').style.display='none';$('#pd').showModal();};
+  $('#lo').onclick=async()=>{
+    close();ADMIN=false;try{localStorage.removeItem('oc-admin');}catch(e){}
+    await load();toast('로그아웃했어요');CUR=null;go('#/');
+  };
+}
+document.addEventListener('click',e=>{if(!e.target.closest('#adm')){const m=$('#amenu');if(m)m.classList.remove('on');}});
+$('#lcancel').onclick=()=>$('#ld').close();
+$('#lf').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(pwHash($('#lpw').value)!==ADMIN_HASH){$('#lerr').style.display='block';return;}
+  ADMIN=true;try{localStorage.setItem('oc-admin',ADMIN_HASH);}catch(e2){}
+  $('#ld').close();await load();toast('관리자 모드로 들어왔어요');CUR=null;go('#/');
+});
+$('#pcancel').onclick=()=>$('#pd').close();
+$('#pmake').onclick=()=>{
+  const v=$('#npw').value;if(!v){toast('새 비밀번호를 입력해 주세요.');return;}
+  $('#pline').value=`const ADMIN_HASH='${pwHash(v)}';`;
+  $('#pout').style.display='block';$('#pcopy').style.display='inline-flex';
+};
+$('#pcopy').onclick=async()=>{try{await copyText($('#pline').value);toast('복사했어요');}catch{toast('복사에 실패했어요');}};
+$('#fileJson').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f||!ADMIN)return;
+  try{
+    const j=JSON.parse(await f.text());
+    if(!Array.isArray(j.characters)||!Array.isArray(j.world))throw 0;
+    if(!confirm('현재 내용이 백업 파일 내용으로 바뀌어요. 계속할까요?'))return;
+    DB=j;migrate();await save();toast('불러왔어요');go('#/');
+  }catch{toast('올바른 백업 파일이 아니에요.');}
+};
+
+/* ---------- 라이트박스 · 라우터 ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-lb]');
+  if(b){$('#lbImg').src=b.dataset.lb;$('#lb').classList.add('on');return;}
+  if(e.target.closest('#lb'))$('#lb').classList.remove('on');
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#lb').classList.remove('on');});
+
+let CUR=null,CURT=0;
+function route(h){
+  if(typeof h!=='string')h=location.hash.replace(/^#/,'')||'/';
+  h=h.replace(/^#/,'')||'/';
+  const now=Date.now();
+  if(h===CUR&&now-CURT<80)return;
+  CUR=h;CURT=now;
+  renderAdmin();
+  try{
+    if(h==='/world')viewList('canon');
+    else if(h==='/new')viewEdit(null,'oc');
+    else if(h==='/wnew')viewEdit(null,'canon');
+    else if(h.startsWith('/edit/'))viewEdit(h.slice(6),'oc');
+    else if(h.startsWith('/wedit/'))viewEdit(h.slice(7),'canon');
+    else if(h.startsWith('/c/'))viewDetail(h.slice(3),'a','oc');
+    else if(h.startsWith('/w/'))viewDetail(h.slice(3),'a','canon');
+    else viewList('oc');
+  }catch(err){
+    $('#view').innerHTML='<div class="empty">화면을 그리는 중 오류가 났어요.<br>'+esc(err&&err.message)+'<br><a class="btn" href="#/">처음으로</a></div>';
+  }
+  window.scrollTo(0,0);
+}
+function go(h){try{history.replaceState(null,'',h);}catch(e){try{location.hash=h;}catch(e2){}}route(h);}
+/* 링크를 눌러도 실제로 페이지가 이동하지 않고 화면만 바꿔요 (사이트에 끼워 넣어도 동작) */
+document.addEventListener('click',e=>{
+  const a=e.target.closest('a[href^="#/"]');
+  if(!a||e.defaultPrevented||e.metaKey||e.ctrlKey||e.shiftKey||e.button)return;
+  e.preventDefault();go(a.getAttribute('href'));
+});
+addEventListener('hashchange',route);
+load().then(route);
+</script>
+</body>
+</html>
