@@ -6,12 +6,13 @@
 <title>OC 도감</title>
 <script>try{var _t=localStorage.getItem('oc-theme');if(!_t&&matchMedia('(prefers-color-scheme:dark)').matches)_t='dark';if(_t)document.documentElement.setAttribute('data-theme',_t);}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#fbfbfa; --card:#fff; --ink:#1c1d21; --sub:#6b6f78; --line:#e6e7ea; --soft:#f1f2f4; --ph:#ececef; --danger:#c2323f; --accent:#c8415a;
   --hdr:rgba(251,251,250,.9);--t1:#444851;--t2:#4a4e57;--t3:#3a3d44;--t4:#34373e;--cardno:rgba(255,255,255,.92);--onink:#fff;--prih:#34363d;--hov:#c9cbd1;--phc:#bfc2c9;--phold:#a1a5ad;--shadow:rgba(20,22,30,.28);
   color-scheme:light;
+  --disp:'Cormorant Garamond','Noto Serif KR',serif;
   --sans:'Noto Serif KR','Nanum Myeongjo','Batang','Times New Roman',serif;
 }
 :root[data-theme="dark"]{
@@ -197,6 +198,61 @@ dialog .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
 .lb{position:fixed;inset:0;background:rgba(15,16,20,.9);display:none;align-items:center;justify-content:center;z-index:50;padding:40px;cursor:zoom-out}
 .lb.on{display:flex}.lb img{max-width:100%;max-height:100%;border-radius:8px}
 
+/* ===== 에디토리얼 미니멀 ===== */
+.wrap{width:min(1180px,100% - 64px)}
+header{border-bottom:1px solid var(--line)}
+.nav{height:72px}
+.brand{font-size:18px;font-weight:600;letter-spacing:.02em}
+.menu{gap:28px}
+.menu a{padding:6px 0;border-radius:0;background:none;border-bottom:1px solid transparent;font-size:15px}
+.menu a:hover{background:none;color:var(--ink)}
+.menu a.on{background:none;color:var(--ink);border-bottom-color:var(--ink)}
+.menu small{font-family:var(--disp);font-size:14px}
+.btn,.admbtn,.themebtn,.in,.ta,.pblock,.pbox,.drop,.acc{border-radius:4px}
+.btn.sm{border-radius:4px}
+dialog{border-radius:6px}
+.admmenu{border-radius:6px}
+.top{padding:76px 0 36px;margin-bottom:48px;border-bottom:1px solid var(--ink);align-items:flex-end}
+.top h1{font-size:clamp(40px,6vw,76px);font-weight:600;letter-spacing:-.03em;line-height:1.05}
+.top p{font-size:15px;margin-top:14px}
+.search{border:0;border-bottom:1px solid var(--line);border-radius:0;background:none;padding:9px 2px;width:240px}
+.search:focus-within{border-bottom-color:var(--ink)}
+.grid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:60px 32px;padding-bottom:120px}
+.card{background:none;border:0;border-radius:0;overflow:visible;box-shadow:none}
+.card:hover{border:0;box-shadow:none}
+.card .img{aspect-ratio:3/4;border-radius:2px}
+.card:hover .img img{transform:scale(1.03)}
+.card .body{padding:16px 0 0}
+.card .cno{font-family:var(--disp);font-style:italic;font-size:15px;color:var(--sub);margin-bottom:4px;line-height:1.2}
+.card .nm{font-size:22px;font-weight:600;letter-spacing:-.01em}
+.card .en{font-family:var(--disp);font-style:italic;font-size:17px}
+.card:hover .nm{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:6px}
+.card .hl{margin-top:6px;font-size:14.5px;line-height:1.6}
+.tagrow{gap:2px 12px;margin-top:10px}
+.tagrow u{background:none;padding:0;border-radius:0;font-size:13px;color:var(--sub)}
+.tagrow u::before{content:'#'}
+.d{grid-template-columns:minmax(300px,520px) 1fr;gap:80px;padding-top:36px}
+.frame{border:0;border-radius:2px}
+.zoom{border-radius:2px}
+.pcap{border-top:1px solid var(--line);padding-top:12px;margin-top:16px;font-size:13.5px}
+.info .no{font-family:var(--disp);font-style:italic;font-size:19px;font-weight:500}
+.info h1{font-size:clamp(48px,6vw,88px);font-weight:600;letter-spacing:-.03em;line-height:1.05;margin-top:6px}
+.info .en{font-family:var(--disp);font-style:italic;font-size:27px;margin-top:12px}
+.tabs{margin-top:48px;gap:30px}
+.tab{text-transform:none;letter-spacing:0;font-size:15px;margin-right:0;padding:12px 0}
+.tab.on{border-color:var(--ink)}
+.sechead .sl{text-transform:none;letter-spacing:.02em;font-size:14px}
+.lead{font-size:26px;font-weight:600;line-height:1.55;letter-spacing:-.01em}
+.desc{margin-top:16px}
+.spec dt{text-transform:none;letter-spacing:0;font-size:13px}
+.tags{gap:4px 16px}
+.tag{background:none;padding:0;border-radius:0;font-size:14px;color:var(--sub)}
+.tag::before{content:'#'}
+.pbox-t{text-transform:none;letter-spacing:.02em}
+.gal .gitem>button:first-child{border-radius:2px}
+.gal{gap:14px}
+footer{padding:28px 0 40px;margin-top:20px}
+
 @media(max-width:820px){
   .wrap{width:calc(100% - 32px)}
   .grid{grid-template-columns:1fr 1fr;gap:12px}
@@ -207,6 +263,17 @@ dialog .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
   .two{grid-template-columns:1fr}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media(max-width:820px){
+  .top{padding:44px 0 26px;margin-bottom:32px}
+  .grid{gap:40px 14px}
+  .card .body{padding:12px 0 0}
+  .card .nm{font-size:18px}
+  .card .en{font-size:15px}
+  .tagrow{display:none}
+  .d{gap:36px}
+  .search{width:100%}
+  .menu{gap:18px}
+}
 </style>
 </head>
 <body>
@@ -222,7 +289,6 @@ dialog .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
   </div>
 </div></header>
 <main class="wrap" id="view"></main>
-<footer class="wrap" id="foot"><span>나의 창작 기록</span></footer>
 
 <dialog id="ld"><form id="lf">
   <h2>관리자 로그인</h2>
@@ -298,7 +364,7 @@ const SEED = {
 /* ---------- 관리자 설정 ----------
    관리자 비밀번호 기본값은 admin1234 예요. 화면 아래 "관리자" 로그인 후 "비밀번호 바꾸기"로 바꿀 수 있어요. */
 const ADMIN_SALT='oc-note';
-const ADMIN_HASH='pk5229q0op';
+const ADMIN_HASH='2dzu94kiwno';
 /* "공개용 파일 만들기"를 누르면 아래 null 자리에 내 도감 내용이 들어간 파일이 만들어져요 */
 const PUBLISHED=/*DATA_START*/null/*DATA_END*/;
 function h53(str,seed=0){let h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(let i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (4294967296*(2097151&h2)+(h1>>>0)).toString(36);}
@@ -387,8 +453,9 @@ function viewList(kind='oc'){
     $('#cnt').textContent=`총 ${list.length}${K.unit}`;
     $('#grid').innerHTML=list.length?list.map(({c,i})=>`
       <a class="card" href="${K.det}${c.id}">
-        <div class="img">${img(c)}<span class="no">${K.pre}${p3(i+1)}</span></div>
+        <div class="img">${img(c)}</div>
         <div class="body">
+          <div class="cno">${K.pre}${p3(i+1)}</div>
           <div class="row"><span class="nm">${esc(c.ko)}</span><span class="en">${esc(c.en)}</span></div>
           ${c.headline?`<div class="hl">${esc(c.headline)}</div>`:''}
           ${c.tags.length?`<div class="tagrow">${c.tags.map(t=>`<u>${esc(t)}</u>`).join('')}</div>`:''}
@@ -431,7 +498,7 @@ function viewDetail(id,tab='a',kind='oc'){
   <section class="d">
     <div class="pic">
       <div class="frame">${img(c)}${c.img?`<button class="zoom" data-lb="${esc(c.img)}" type="button">크게 보기</button>`:''}</div>
-      <div class="pcap"><span>${p3(idx+1)} / 메인 이미지</span><span>${esc(c.caption)}</span></div>
+      ${c.caption?`<div class="pcap"><span>${esc(c.caption)}</span></div>`:''}
     </div>
     <div class="info">
       <div class="no">${K.pre}${p3(idx+1)}</div>
